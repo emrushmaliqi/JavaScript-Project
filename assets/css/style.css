@@ -1,0 +1,33 @@
+p,
+h5 {
+  margin: 0;
+}
+
+.text-green {
+  color: #28a745;
+}
+
+.text-red {
+  color: #dc3545;
+}
+
+.text-yellow {
+  color: #ffe234;
+}
+
+meter::-webkit-meter-optimum-value {
+  background: green;
+}
+
+meter::-webkit-meter-suboptimum-value {
+  background: red;
+}
+
+input {
+  outline: none;
+  border: none;
+}
+
+.unWatch:hover {
+  color: black;
+}

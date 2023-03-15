@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CryptoTrack</title>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="/node_modules/bootstrap-icons/font/bootstrap-icons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="node_modules/bootstrap/dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body>
+    <div id="header"></div>
+
+    <div id="token" class="container"></div>
+    <script src="./assets/js/dynamicEventListener.js"></script>
+    <script type="module">
+      import Header from "./components/Header.js";
+      import { getTokenById } from "./modules/Tokens.js";
+      import ViewToken from "./components/ViewToken.js";
+      import { getLocalWallet, getLocalWatchList } from "./modules/getLocal.js";
+
+      let tokenData;
+      header.innerHTML = Header();
+      addDynamicEventListener(
+        document.body,
+        "keyup",
+        "#usdInput",
+        e =>
+          (tokenInput.value =
+            e.target.value / tokenData.market_data.current_price.usd)
+      );
+      addDynamicEventListener(
+        document.body,
+        "change",
+        "#usdInput",
+        e =>
+          (tokenInput.value =
+            e.target.value / tokenData.market_data.current_price.usd)
+      );
+      addDynamicEventListener(
+        document.body,
+        "keyup",
+        "#tokenInput",
+        e =>
+          (usdInput.value =
+            e.target.value * tokenData.market_data.current_price.usd)
+      );
+      addDynamicEventListener(
+        document.body,
+        "change",
+        "#tokenInput",
+        e =>
+          (usdInput.value =
+            e.target.value * tokenData.market_data.current_price.usd)
+      );
+
+      addDynamicEventListener(document.body, "click", "#buyBtn", handleBuy);
+      addDynamicEventListener(document.body, "click", "#sellBtn", handleSell);
+
+      addDynamicEventListener(
+        document.body,
+        "click",
+        "#watchListBtn",
+        addToWatchList
+      );
+
+      function handleBuy(e) {
+        if (tokenInput.value < 0.001 || usdInput.value < 0.001) {
+          alert("Minimum buy amount is 0.001");
+          return;
+        }
+        const wallet = getLocalWallet();
+        if (wallet.usd > usdInput.value) {
+          const usd = (wallet.usd - usdInput.value).toFixed(3);
+          wallet.usd = usd;
+          const token = (
+            Number(wallet[tokenData.id]) + Number(tokenInput.value)
+          ).toFixed(3);
+          localStorage.setItem(
+            "wallet",
+            JSON.stringify({
+              ...wallet,
+              usd,
+              [tokenData.id]: token,
+            })
+          );
+          usdValue.innerHTML = usd;
+          tokenValue.innerHTML = token;
+        } else {
+          alert("Not enough USD");
+        }
+      }
+
+      function handleSell(e) {
+        if (tokenInput.value < 0.001 || usdInput.value < 0.001) {
+          alert("Minimum sell amount is 0.001");
+          return;
+        }
+
+        const wallet = getLocalWallet();
+
+        if (wallet[tokenData.id] > tokenInput.value) {
+          const usd = (Number(wallet.usd) + Number(usdInput.value)).toFixed(3);
+          const token = (
+            Number(wallet[tokenData.id]) - tokenInput.value
+          ).toFixed(3);
+          wallet[tokenData.id] = token;
+          localStorage.setItem(
+            "wallet",
+            JSON.stringify({ ...wallet, usd, [tokenData.id]: token })
+          );
+          usdValue.innerHTML = usd;
+          tokenValue.innerHTML = token;
+        } else {
+          alert(`Not enough ${tokenData.symbol}`);
+        }
+      }
+
+      function addToWatchList() {
+        const watchList = getLocalWatchList();
+        const inWatchList = watchList
+          ? watchList.find(id => id == tokenData.id)
+          : false;
+        if (inWatchList) {
+          localStorage.setItem(
+            "watchList",
+            JSON.stringify(watchList.filter(id => id != tokenData.id))
+          );
+        } else {
+          localStorage.setItem(
+            "watchList",
+            JSON.stringify(
+              watchList ? [...watchList, tokenData.id] : [tokenData.id]
+            )
+          );
+        }
+        watchListBtn.classList.toggle("bi-star");
+        watchListBtn.classList.toggle("bi-star-fill");
+        watchListBtn.classList.toggle("text-yellow");
+      }
+
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const id = urlParams.get("id");
+      getTokenById(id).then(res => {
+        document.title = `${res.name} - CryptoTrack`;
+        token.innerHTML = ViewToken(res);
+        tokenData = res;
+      });
+    </script>
+  </body>
+</html>
