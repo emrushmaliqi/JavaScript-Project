@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CryptoTrack</title>
+    <link rel="icon" type="image/x-icon" href="./assets/images/fav-icon.png" />
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <link
       rel="stylesheet"
@@ -14,8 +15,9 @@
   </head>
   <body>
     <div id="header"></div>
+    <h2 class="container mt-4">Tokens</h2>
     <div class="container my-5">
-      <div class="row py-3 border-top border-bottom">
+      <div class="row py-3 border-top border-bottom" id="tokensTableTitle">
         <h5 class="col-5 col-sm-4 col-md-3 col-lg-3">Name</h5>
         <h5 class="col-4 col-sm-3 col-md-2 col-lg-2">Price</h5>
         <h5 class="col-1 col-sm-2 col-md-3 col-lg-2 d-none d-sm-block">
@@ -28,20 +30,80 @@
       </div>
       <div id="tokens"></div>
     </div>
+    <div id="scrollerContainer"></div>
 
+    <script src="./assets/js/dynamicEventListener.js"></script>
     <script type="module">
       import Header from "./components/Header.js";
       import Token from "./components/Token.js";
-      import { getTokens } from "./modules/Tokens.js";
-      header.innerHTML = Header();
+      import ScrollToTop from "./components/ScrollToTop.js";
+      import { getTokens, searchTokens } from "./modules/Tokens.js";
+      import { toggleScroller } from "./modules/scrollToTop.js";
 
-      getTokens()
-        .then(data => {
-          let tokensHTML = "";
-          data.forEach(token => (tokensHTML += Token(token)));
-          tokens.innerHTML = tokensHTML;
-        })
-        .catch(err => console.error(err));
+      header.innerHTML = Header("home");
+      let page = 1;
+
+      updateTokensList();
+
+      function updateTokensList() {
+        setTimeout(() => {
+          getTokens(page)
+            .then(data => {
+              let tokensHTML = "";
+              data.forEach(token => (tokensHTML += Token(token) || ""));
+              tokens.innerHTML += tokensHTML;
+              window.addEventListener("scroll", handleInfiniteScroll);
+              page++;
+            })
+            .catch(err => console.error(err));
+        }, 500);
+      }
+
+      function removeScrollListener() {
+        window.removeEventListener("scroll", handleInfiniteScroll);
+      }
+
+      function handleInfiniteScroll() {
+        if (
+          window.innerHeight + window.pageYOffset >=
+          document.body.offsetHeight
+        ) {
+          removeScrollListener();
+          updateTokensList();
+        }
+      }
+
+      scrollerContainer.innerHTML += ScrollToTop();
+      toggleScroller();
+
+      addDynamicEventListener(document.body, "click", "#scrollToTop", () =>
+        window.scrollTo(0, 0)
+      );
+
+      addDynamicEventListener(
+        document.body,
+        "submit",
+        "#searchForm",
+        handleSearch
+      );
+
+      function handleSearch(e) {
+        e.preventDefault();
+        if (searchQuery.value) {
+          searchTokens(searchQuery.value).then(data => {
+            removeScrollListener();
+            let tokensHTML = "";
+            if (data.length) {
+              tokensTableTitle.classList.remove("d-none");
+              data.forEach(token => (tokensHTML += Token(token) || ""));
+            } else {
+              tokensHTML = "No tokens found!";
+              tokensTableTitle.classList.add("d-none");
+            }
+            tokens.innerHTML = tokensHTML;
+          });
+        }
+      }
     </script>
   </body>
 </html>

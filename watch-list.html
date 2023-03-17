@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WatchList - CryptoTrack</title>
+    <link rel="icon" type="image/x-icon" href="./assets/images/fav-icon.png" />
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <link
       rel="stylesheet"
@@ -19,8 +20,8 @@
   <body>
     <div id="header"></div>
 
-    <h2 class="container mt-5">WatchList</h2>
-    <div id="tokensContainer" class="container my-3"></div>
+    <h2 class="container mt-4">WatchList</h2>
+    <div id="tokensContainer" class="container my-5"></div>
 
     <div
       class="modal fade"
@@ -65,15 +66,20 @@
         </div>
       </div>
     </div>
+
+    <div id="scrollerContainer"></div>
+
     <script src="./assets/js/dynamicEventListener.js"></script>
 
     <script type="module">
       import Header from "./components/Header.js";
       import Token from "./components/Token.js";
-      import { getWatchListTokens } from "./modules/Tokens.js";
+      import ScrollToTop from "./components/ScrollToTop.js";
+      import { getTokensById } from "./modules/Tokens.js";
       import { getLocalWatchList } from "./modules/getLocal.js";
+      import { toggleScroller } from "./modules/scrollToTop.js";
 
-      header.innerHTML = Header();
+      header.innerHTML = Header("watchList");
 
       let unWatchToken;
       const localWatchList = getLocalWatchList();
@@ -105,16 +111,23 @@
       </div>
       <div id="tokens"></div>
       `;
-        getWatchListTokens(localWatchList)
+        getTokensById(localWatchList)
           .then(data => {
             let tokensHTML = "";
-            data.forEach(token => (tokensHTML += Token(token)));
+            data.forEach(token => (tokensHTML += Token(token, true) || ""));
             tokens.innerHTML = tokensHTML;
           })
           .catch(err => console.error(err));
       } else {
         tokensContainer.innerHTML = "<h4>There are no tokens in WishList</h4>";
       }
+
+      scrollerContainer.innerHTML += ScrollToTop();
+      toggleScroller();
+
+      addDynamicEventListener(document.body, "click", "#scrollToTop", () =>
+        window.scrollTo(0, 0)
+      );
     </script>
   </body>
 </html>

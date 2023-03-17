@@ -1,16 +1,21 @@
 import { numberWithCommas } from "../assets/js/numberFormat.js";
 
 export default function Token(token, inWatchList = false) {
-  return `
+  try {
+    return `
     <div class="row d-flex align-items-center border-bottom" style="min-height:60px;">
-      <div class="col-5 col-sm-4 col-md-3 col-lg-3 d-flex gap-1 align-items-center py-2">
+      <div class="col-5 col-sm-4 col-md-3 col-lg-3 align-items-center py-2">
+      <a class="text-decoration-none text-black d-flex gap-1" href="token-page.html?id=${
+        token.id
+      }">
         <img src="${token.image}" alt="${
-    token.name
-  } image" style="height:25px;" />
-        <p class="d-sm-block d-none"><a class="text-decoration-none text-black" href="token-page.html?id=${
-          token.id
-        }">${token.name}</a></p>
+      token.name
+    } image" style="height:25px;" />
+        <p class="d-sm-block d-none ${inWatchList ? "text-primary" : ""}">${
+      token.name
+    }</p>
         <p class="text-secondary">${token.symbol.toUpperCase()}</p>
+        </a>
       </div>
       <div class="col-4 col-sm-3 col-md-2 col-lg-2">
         <p>$${numberWithCommas(
@@ -29,12 +34,14 @@ export default function Token(token, inWatchList = false) {
         <p>$${numberWithCommas(token.total_volume)}</p>
       </div>
       <div class="col-md-1 col-3 d-flex align-items-center gap-2">
-        <a type="button" class="btn btn-primary" href="token-page.html?id=${
-          token.id
-        }">Details</a>
-        <i type="button" class="bi bi-star-fill text-yellow unWatch" data-bs-toggle="modal" data-bs-target="#exampleModal" id="${
-          token.id
-        }" ></i>
+      ${
+        inWatchList
+          ? `<i type="button" class="bi bi-star-fill text-yellow unWatch" data-bs-toggle="modal" data-bs-target="#exampleModal" id="${token.id}" ></i>`
+          : `<a type="button" class="btn btn-primary" href="token-page.html?id=${token.id}">Details</a>`
+      }    
       </div>
     </div>`;
+  } catch (err) {
+    console.error(err);
+  }
 }

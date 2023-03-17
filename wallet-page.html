@@ -5,11 +5,83 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CryptoTrack - Wallet</title>
+    <link rel="icon" type="image/x-icon" href="./assets/images/fav-icon.png" />
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <link
       rel="stylesheet"
       href="node_modules/bootstrap/dist/css/bootstrap.min.css"
     />
+    <link rel="stylesheet" href="./assets/css/style.css" />
   </head>
-  <body></body>
+  <body>
+    <div id="header"></div>
+
+    <h2 class="container mt-4">Wallet</h2>
+    <div id="tokens" class="container my-5">
+      <div class="row px-sm-4 px-lg-4 mx-sm-5 py-2 border-bottom">
+        <span class="col-3">Token</span>
+        <span class="col-3">Amount</span>
+        <span class="col-3">24H Change</span>
+        <span class="col-3 text-center" id="totalUsd"></span>
+      </div>
+      <div class="row px-sm-4 px-lg-4 mx-sm-5 py-2 border-bottom">
+        <span class="col-3">$ - USD</span>
+        <span class="col-3" id="usdAmount"> </span>
+      </div>
+    </div>
+
+    <div id="scrollerContainer"></div>
+
+    <script src="./assets/js/dynamicEventListener.js"></script>
+    <script type="module">
+      import Header from "./components/Header.js";
+      import WalletToken from "./components/WalletToken.js";
+      import ScrollToTop from "./components/ScrollToTop.js";
+      import { getTokensById } from "./modules/Tokens.js";
+      import { getLocalWallet } from "./modules/getLocal.js";
+      import { toggleScroller } from "./modules/scrollToTop.js";
+
+      header.innerHTML = Header("wallet");
+
+      if (!getLocalWallet()) {
+        localStorage.setItem("wallet", JSON.stringify({ usd: 10000 }));
+      }
+
+      const wallet = getLocalWallet();
+      let tokens = [];
+      let total = wallet.usd;
+
+      for (const key in wallet) {
+        if (key !== "usd" && wallet[key]) {
+          tokens.push(key);
+        }
+      }
+
+      usdAmount.innerHTML = wallet.usd;
+
+      if (tokens.length) {
+        getTokensById(tokens)
+          .then(data => {
+            let tokensHTML = "";
+            data.forEach(token => {
+              total += wallet[token.id] * token.current_price;
+              tokensHTML += WalletToken(token, wallet[token.id]) || "";
+            });
+            totalUsd.innerHTML = `Total Balance: $${total.toFixed(2)}`;
+            document.getElementById("tokens").innerHTML += tokensHTML;
+          })
+          .catch(err => console.error(err));
+      }
+      totalUsd.innerHTML = `Total Balance: $${
+        total % 1 == 0 ? total.toFixed() : total.toFixed(2)
+      }`;
+
+      scrollerContainer.innerHTML += ScrollToTop();
+      toggleScroller();
+
+      addDynamicEventListener(document.body, "click", "#scrollToTop", () =>
+        window.scrollTo(0, 0)
+      );
+    </script>
+  </body>
 </html>

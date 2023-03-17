@@ -11,8 +11,6 @@ export default function ViewToken(token) {
   const watchList = getLocalWatchList();
   const inWatchList = watchList ? watchList.find(id => id == token.id) : false;
 
-  console.log(walletData);
-
   return `
   <div class="container my-5 d-flex flex-column gap-2">
     <div class="d-flex align-items-center gap-2">
@@ -60,7 +58,7 @@ export default function ViewToken(token) {
         </div>
     </div>
 
-    <div class="row mt-5">
+    <div class="row mt-4">
         <div class="col-12 col-sm-6 d-flex flex-column">
           <div class="d-flex justify-content-between align-items-center border-bottom py-2">
             <span class="text-secondary">Market Cap</span>
@@ -118,7 +116,7 @@ export default function ViewToken(token) {
               )}</span></span>
               <span>${token.name}: <span id="tokenValue">${numberWithCommas(
     walletData[token.id]
-  )}<span></span>
+  )}</span></span>
         </div>
         <div>
             <div class="d-flex border rounded ps-2">
@@ -132,10 +130,11 @@ export default function ViewToken(token) {
               }" id="usdInput" class="w-100 ps-2 py-2" />
             </div>
         </div>
-        <div class="d-flex gap-3">
-          <button type="button" id="buyBtn" class="btn btn-success w-50">Buy</button>
-          <button type="button" id="sellBtn" class="btn btn-danger w-50">Sell</button>
+        <div class="d-flex gap-3 mt-2">
+        <button type="button" id="buyBtn" class="btn btn-success w-50">Buy</button>
+        <button type="button" id="sellBtn" class="btn btn-danger w-50">Sell</button>
         </div>
+        <span class="text-danger text-center" id="tradeError"></span>
     </div>
   </div>`;
 }

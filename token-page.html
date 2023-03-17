@@ -5,6 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CryptoTrack</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="./assets/images/fav-icon.png"
+      id="titleIcon"
+    />
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <link
       rel="stylesheet"
@@ -72,18 +78,33 @@
         addToWatchList
       );
 
+      function handleError(error) {
+        tradeError.innerText = error;
+        setTimeout(() => {
+          tradeError.innerText = "";
+        }, 2000);
+      }
+
       function handleBuy(e) {
         if (tokenInput.value < 0.001 || usdInput.value < 0.001) {
-          alert("Minimum buy amount is 0.001");
+          handleError("Minimum buy amount is 0.001");
           return;
         }
         const wallet = getLocalWallet();
-        if (wallet.usd > usdInput.value) {
-          const usd = (wallet.usd - usdInput.value).toFixed(3);
-          wallet.usd = usd;
-          const token = (
-            Number(wallet[tokenData.id]) + Number(tokenInput.value)
-          ).toFixed(3);
+        if (getLocalWallet().usd > usdInput.value) {
+          const usdWithDecimal = wallet.usd - Number(usdInput.value);
+          const usd =
+            usdWithDecimal % 1 === 0
+              ? Math.floor(usdWithDecimal)
+              : Number(usdWithDecimal.toFixed(3));
+
+          const tokenWithDecimal =
+            Number(tokenInput.value) + wallet[tokenData.id];
+          const token =
+            tokenWithDecimal % 1 == 0
+              ? Math.floor(tokenWithDecimal)
+              : Number(tokenWithDecimal.toFixed(3));
+
           localStorage.setItem(
             "wallet",
             JSON.stringify({
@@ -95,24 +116,29 @@
           usdValue.innerHTML = usd;
           tokenValue.innerHTML = token;
         } else {
-          alert("Not enough USD");
+          handleError("Not enough USD");
         }
       }
 
       function handleSell(e) {
         if (tokenInput.value < 0.001 || usdInput.value < 0.001) {
-          alert("Minimum sell amount is 0.001");
+          handleError("Minimum buy amount is 0.001");
           return;
         }
 
         const wallet = getLocalWallet();
 
-        if (wallet[tokenData.id] > tokenInput.value) {
-          const usd = (Number(wallet.usd) + Number(usdInput.value)).toFixed(3);
-          const token = (
-            Number(wallet[tokenData.id]) - tokenInput.value
-          ).toFixed(3);
-          wallet[tokenData.id] = token;
+        if (getLocalWallet()[tokenData.id] > tokenInput.value) {
+          const usdWithDecimal = Number(usdInput.value) + wallet.usd;
+          const usd =
+            usdWithDecimal % 1 === 0
+              ? Math.floor(usdWithDecimal)
+              : Number(usdWithDecimal.toFixed(3));
+          const tokenWithDecimal = wallet[tokenData.id] - tokenInput.value;
+          const token =
+            tokenWithDecimal % 1 === 0
+              ? Math.floor(tokenWithDecimal)
+              : Number(tokenWithDecimal.toFixed(3));
           localStorage.setItem(
             "wallet",
             JSON.stringify({ ...wallet, usd, [tokenData.id]: token })
@@ -120,7 +146,7 @@
           usdValue.innerHTML = usd;
           tokenValue.innerHTML = token;
         } else {
-          alert(`Not enough ${tokenData.symbol}`);
+          handleError(`Not enough ${tokenData.symbol.toUpperCase()}`);
         }
       }
 
@@ -151,6 +177,7 @@
       const urlParams = new URLSearchParams(queryString);
       const id = urlParams.get("id");
       getTokenById(id).then(res => {
+        titleIcon.href = res.image.thumb;
         document.title = `${res.name} - CryptoTrack`;
         token.innerHTML = ViewToken(res);
         tokenData = res;
