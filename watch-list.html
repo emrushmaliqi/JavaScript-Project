@@ -66,6 +66,7 @@
         </div>
       </div>
     </div>
+    <div id="spinnerDiv"></div>
 
     <div id="scrollerContainer"></div>
 
@@ -74,12 +75,14 @@
     <script type="module">
       import Header from "./components/Header.js";
       import Token from "./components/Token.js";
+      import Spinner from "./components/Spinner.js";
       import ScrollToTop from "./components/ScrollToTop.js";
       import { getTokensById } from "./modules/Tokens.js";
       import { getLocalWatchList } from "./modules/getLocal.js";
       import { toggleScroller } from "./modules/scrollToTop.js";
 
       header.innerHTML = Header("watchList");
+      spinnerDiv.innerHTML = Spinner();
 
       let unWatchToken;
       const localWatchList = getLocalWatchList();
@@ -114,6 +117,7 @@
         getTokensById(localWatchList)
           .then(data => {
             let tokensHTML = "";
+            loadingSpinner.classList.add("d-none");
             data.forEach(token => (tokensHTML += Token(token, true) || ""));
             tokens.innerHTML = tokensHTML;
           })

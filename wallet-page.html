@@ -29,6 +29,7 @@
         <span class="col-3" id="usdAmount"> </span>
       </div>
     </div>
+    <div id="spinnderDiv"></div>
 
     <div id="scrollerContainer"></div>
 
@@ -36,12 +37,14 @@
     <script type="module">
       import Header from "./components/Header.js";
       import WalletToken from "./components/WalletToken.js";
+      import Spinner from "./components/Spinner.js";
       import ScrollToTop from "./components/ScrollToTop.js";
       import { getTokensById } from "./modules/Tokens.js";
       import { getLocalWallet } from "./modules/getLocal.js";
       import { toggleScroller } from "./modules/scrollToTop.js";
 
       header.innerHTML = Header("wallet");
+      spinnerDiv.innerHTML = Spinner();
 
       if (!getLocalWallet()) {
         localStorage.setItem("wallet", JSON.stringify({ usd: 10000 }));
@@ -63,6 +66,7 @@
         getTokensById(tokens)
           .then(data => {
             let tokensHTML = "";
+            loadingSpinner.classList.add("d-none");
             data.forEach(token => {
               total += wallet[token.id] * token.current_price;
               tokensHTML += WalletToken(token, wallet[token.id]) || "";

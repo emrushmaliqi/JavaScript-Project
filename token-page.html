@@ -26,15 +26,19 @@
     <div id="header"></div>
 
     <div id="token" class="container"></div>
+    <div id="spinnerDiv"></div>
     <script src="./assets/js/dynamicEventListener.js"></script>
     <script type="module">
       import Header from "./components/Header.js";
-      import { getTokenById } from "./modules/Tokens.js";
+      import Spinner from "./components/Spinner.js";
       import ViewToken from "./components/ViewToken.js";
+      import { getTokenById } from "./modules/Tokens.js";
       import { getLocalWallet, getLocalWatchList } from "./modules/getLocal.js";
 
       let tokenData;
       header.innerHTML = Header();
+      spinnerDiv.innerHTML = Spinner();
+
       addDynamicEventListener(
         document.body,
         "keyup",
@@ -179,6 +183,7 @@
       getTokenById(id).then(res => {
         titleIcon.href = res.image.thumb;
         document.title = `${res.name} - CryptoTrack`;
+        loadingSpinner.classList.add("d-none");
         token.innerHTML = ViewToken(res);
         tokenData = res;
       });
