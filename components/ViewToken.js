@@ -109,7 +109,7 @@ export default function ViewToken(token) {
         </div>
     </div>
 
-    <div class="mx-auto w-50 d-flex flex-column gap-2 border rounded p-3 mt-5">
+    <div class="mx-auto width-100 width-75 w-50 d-flex flex-column gap-2 border rounded p-3 mt-5">
         <div class="d-flex justify-content-around">
               <span>USD: <span id="usdValue">${numberWithCommas(
                 walletData.usd

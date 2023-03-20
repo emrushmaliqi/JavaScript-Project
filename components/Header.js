@@ -25,7 +25,7 @@ export default function Header(location) {
           </li>
         </ul>
       <form class="d-flex ${
-        location == "home" ? "" : "invisible"
+        location == "home" ? "" : "d-none"
       }" id="searchForm" role="search">
         <input class="form-control me-2" id="searchQuery" type="search" placeholder="Search Tokens" aria-label="Search">
         <button class="btn btn-outline-primary" type="submit">Search</button>
