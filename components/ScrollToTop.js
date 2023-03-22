@@ -1,4 +1,4 @@
-export default function scrollToTop() {
+function scrollToTopElement() {
   return `
     <div
       type="button"
@@ -9,4 +9,16 @@ export default function scrollToTop() {
       <span style="font-size: 32px; line-height: 1">&#708;</span>
     </div>
     `;
+}
+
+export default function initializeScrollToTop() {
+  scrollerContainer.innerHTML = scrollToTopElement();
+  scrollToTop.addEventListener("click", () => window.scrollTo(0, 0));
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 400) {
+      scrollToTop.classList.remove("d-none");
+    } else {
+      scrollToTop.classList.add("d-none");
+    }
+  });
 }

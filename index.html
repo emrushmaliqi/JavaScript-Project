@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -35,17 +35,17 @@
 
     <script src="./assets/js/dynamicEventListener.js"></script>
     <script type="module">
-      import Header from "./components/Header.js";
+      import initializeHeader from "./components/Header.js";
       import Token from "./components/Token.js";
-      import ScrollToTop from "./components/ScrollToTop.js";
+      import initializeScrollToTop from "./components/ScrollToTop.js";
       import Spinner from "./components/Spinner.js";
       import { getTokens, searchTokens } from "./modules/Tokens.js";
-      import { toggleScroller } from "./modules/scrollToTop.js";
 
-      header.innerHTML = Header("home");
+      initializeHeader("home");
+      initializeScrollToTop();
+      const themeCircle = document.getElementById("theme-circle");
       spinnerDiv.innerHTML = Spinner(true);
-      scrollerContainer.innerHTML += ScrollToTop();
-      toggleScroller();
+
       let page = 1;
       updateTokensList();
 
@@ -79,16 +79,7 @@
         }
       }
 
-      addDynamicEventListener(document.body, "click", "#scrollToTop", () =>
-        window.scrollTo(0, 0)
-      );
-
-      addDynamicEventListener(
-        document.body,
-        "submit",
-        "#searchForm",
-        handleSearch
-      );
+      searchForm.addEventListener("submit", handleSearch);
 
       function handleSearch(e) {
         e.preventDefault();

@@ -1,6 +1,6 @@
 export default function WalletToken(token, amount) {
   return `
-    <div class="row d-flex align-items-center py-2 px-sm-4 px-lg-4 mx-sm-5 border-bottom">
+    <div class="token-container row d-flex align-items-center py-2 px-sm-4 px-lg-4 mx-sm-5 border-bottom">
       <span class="col-3">${token.symbol.toUpperCase()}</span>
       <div class="col-3 d-flex flex-column">
             <span>${amount}</span>

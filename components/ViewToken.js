@@ -23,7 +23,7 @@ export default function ViewToken(token) {
     </div>
     <div>
         <h2 class="d-flex align-items-center">$${numberWithCommas(
-          token.market_data.current_price.usd.toFixed(3)
+          token.market_data.current_price.usd
         )} 
             <span class="fs-5 ${priceChange < 0 ? "text-red" : "text-green"}">
                 &nbsp;${priceChange > 0 ? "&#708;" : "&#8964;"}${Math.abs(

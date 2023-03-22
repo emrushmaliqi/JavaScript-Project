@@ -21,6 +21,7 @@
     <div id="header"></div>
 
     <h2 class="container mt-4">WatchList</h2>
+
     <div id="tokensContainer" class="container my-5"></div>
 
     <div
@@ -73,15 +74,15 @@
     <script src="./assets/js/dynamicEventListener.js"></script>
 
     <script type="module">
-      import Header from "./components/Header.js";
+      import initializeHeader from "./components/Header.js";
+      import initializeScrollToTop from "./components/ScrollToTop.js";
       import Token from "./components/Token.js";
       import Spinner from "./components/Spinner.js";
-      import ScrollToTop from "./components/ScrollToTop.js";
       import { getTokensById } from "./modules/Tokens.js";
       import { getLocalWatchList } from "./modules/getLocal.js";
-      import { toggleScroller } from "./modules/scrollToTop.js";
 
-      header.innerHTML = Header("watchList");
+      initializeHeader("watchList");
+      initializeScrollToTop();
       spinnerDiv.innerHTML = Spinner();
 
       let unWatchToken;
@@ -99,8 +100,16 @@
         unWatchToken = e.target.id;
       });
 
+      addDynamicEventListener(document.body, "click", "#refreshBtn", e => {
+        tokens.innerHTML = "";
+        loadingSpinner.classList.remove("d-none");
+        getTokensById(localWatchList).then(data => updateTokens(data));
+      });
+
       if (localWatchList.length) {
-        tokensContainer.innerHTML += `
+        getTokensById(localWatchList)
+          .then(data => {
+            tokensContainer.innerHTML += `
         <div class="row py-3 border-top border-bottom">
         <h5 class="col-5 col-sm-4 col-md-3 col-lg-3">Name</h5>
         <h5 class="col-4 col-sm-3 col-md-2 col-lg-2">Price</h5>
@@ -111,27 +120,23 @@
         <h5 class="col-4 col-lg-2 d-sm-none d-md-block d-none d-sm-block">
           Volume
         </h5>
+          <i class="bi bi-arrow-clockwise col-md-1 col-3" id="refreshBtn" disabled type="button"></i>
       </div>
       <div id="tokens"></div>
       `;
-        getTokensById(localWatchList)
-          .then(data => {
-            let tokensHTML = "";
-            loadingSpinner.classList.add("d-none");
-            data.forEach(token => (tokensHTML += Token(token, true) || ""));
-            tokens.innerHTML = tokensHTML;
+            updateTokens(data);
           })
           .catch(err => console.error(err));
       } else {
         tokensContainer.innerHTML = "<h4>There are no tokens in WishList</h4>";
       }
 
-      scrollerContainer.innerHTML += ScrollToTop();
-      toggleScroller();
-
-      addDynamicEventListener(document.body, "click", "#scrollToTop", () =>
-        window.scrollTo(0, 0)
-      );
+      function updateTokens(data) {
+        let tokensHTML = "";
+        data.forEach(token => (tokensHTML += Token(token, true)) || "");
+        tokens.innerHTML = tokensHTML;
+        loadingSpinner.classList.add("d-none");
+      }
     </script>
   </body>
 </html>

@@ -35,15 +35,16 @@
 
     <script src="./assets/js/dynamicEventListener.js"></script>
     <script type="module">
-      import Header from "./components/Header.js";
+      import initializeHeader from "./components/Header.js";
+
       import WalletToken from "./components/WalletToken.js";
       import Spinner from "./components/Spinner.js";
-      import ScrollToTop from "./components/ScrollToTop.js";
+      import initializeScrollToTop from "./components/ScrollToTop.js";
       import { getTokensById } from "./modules/Tokens.js";
       import { getLocalWallet } from "./modules/getLocal.js";
-      import { toggleScroller } from "./modules/scrollToTop.js";
 
-      header.innerHTML = Header("wallet");
+      initializeHeader("wallet");
+      initializeScrollToTop();
       spinnerDiv.innerHTML = Spinner();
 
       if (!getLocalWallet()) {
@@ -79,13 +80,6 @@
       totalUsd.innerHTML = `Total Balance: $${
         total % 1 == 0 ? total.toFixed() : total.toFixed(2)
       }`;
-
-      scrollerContainer.innerHTML += ScrollToTop();
-      toggleScroller();
-
-      addDynamicEventListener(document.body, "click", "#scrollToTop", () =>
-        window.scrollTo(0, 0)
-      );
     </script>
   </body>
 </html>

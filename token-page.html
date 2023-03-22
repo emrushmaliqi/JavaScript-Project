@@ -29,15 +29,26 @@
     <div id="spinnerDiv"></div>
     <script src="./assets/js/dynamicEventListener.js"></script>
     <script type="module">
-      import Header from "./components/Header.js";
+      import initializeHeader from "./components/Header.js";
+
       import Spinner from "./components/Spinner.js";
       import ViewToken from "./components/ViewToken.js";
       import { getTokenById } from "./modules/Tokens.js";
       import { getLocalWallet, getLocalWatchList } from "./modules/getLocal.js";
 
       let tokenData;
-      header.innerHTML = Header();
+      initializeHeader();
       spinnerDiv.innerHTML = Spinner();
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const id = urlParams.get("id");
+      getTokenById(id).then(res => {
+        titleIcon.href = res.image.thumb;
+        document.title = `${res.name} - CryptoTrack`;
+        loadingSpinner.classList.add("d-none");
+        token.innerHTML = ViewToken(res);
+        tokenData = res;
+      });
 
       addDynamicEventListener(
         document.body,
@@ -176,17 +187,6 @@
         watchListBtn.classList.toggle("bi-star-fill");
         watchListBtn.classList.toggle("text-yellow");
       }
-
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
-      const id = urlParams.get("id");
-      getTokenById(id).then(res => {
-        titleIcon.href = res.image.thumb;
-        document.title = `${res.name} - CryptoTrack`;
-        loadingSpinner.classList.add("d-none");
-        token.innerHTML = ViewToken(res);
-        tokenData = res;
-      });
     </script>
   </body>
 </html>
