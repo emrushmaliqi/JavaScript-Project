@@ -9,6 +9,10 @@
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <link
       rel="stylesheet"
+      href="node_modules/bootstrap-icons/font/bootstrap-icons.css"
+    />
+    <link
+      rel="stylesheet"
       href="node_modules/bootstrap/dist/css/bootstrap.min.css"
     />
     <link rel="stylesheet" href="./assets/css/style.css" />
@@ -22,16 +26,58 @@
         <span class="col-3">Token</span>
         <span class="col-3">Amount</span>
         <span class="col-3">24H Change</span>
-        <span class="col-3 text-center" id="totalUsd"></span>
+        <span id="totalUsd" class="col-3 text-center d-flex gap-1"></span>
       </div>
       <div class="row px-sm-4 px-lg-4 mx-sm-5 py-2 border-bottom">
         <span class="col-3">$ - USD</span>
-        <span class="col-3" id="usdAmount"> </span>
+        <span class="col-6" id="usdAmount"> </span>
+        <i
+          type="button"
+          class="bi bi-plus-circle col-3 text-center"
+          data-bs-toggle="modal"
+          data-bs-target="#addMoneyModal"
+        ></i>
       </div>
     </div>
     <div id="spinnerDiv"></div>
 
     <div id="scrollerContainer"></div>
+
+    <div class="modal fade" id="addMoneyModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add USD to wallet</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input
+              type="number"
+              placeholder="Enter amount"
+              class="w-100 border p-2 rounded"
+              id="addInput"
+            />
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary" id="addBtn">
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="./assets/js/dynamicEventListener.js"></script>
     <script type="module">
@@ -80,6 +126,19 @@
       totalUsd.innerHTML = `Total Balance: $${
         total % 1 == 0 ? total.toFixed() : total.toFixed(2)
       }`;
+
+      addBtn.addEventListener("click", () => {
+        if (addInput.value > 0) {
+          localStorage.setItem(
+            "wallet",
+            JSON.stringify({
+              ...wallet,
+              usd: wallet.usd + Number(addInput.value),
+            })
+          );
+          window.location.href = "";
+        }
+      });
     </script>
   </body>
 </html>
