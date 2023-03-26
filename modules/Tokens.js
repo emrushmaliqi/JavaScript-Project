@@ -1,8 +1,10 @@
 import axios from "../node_modules/axios/dist/esm/axios.js";
 
-export async function getTokens(page) {
+export async function getTokens(page, category = null) {
   const res = await axios.get(
-    `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=${page}&sparkline=false`
+    `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&${
+      category ? `category=${category}&` : ""
+    }order=market_cap_desc&per_page=20&page=${page}&sparkline=false`
   );
   return res.data;
 }

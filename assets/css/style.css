@@ -50,7 +50,7 @@ a.active {
 }
 
 button.navbar-toggler {
-  background-color: var(--emphasize);
+  border-color: var(--emphasize);
 }
 
 p,

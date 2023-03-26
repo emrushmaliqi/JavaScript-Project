@@ -110,6 +110,7 @@
       usdAmount.innerHTML = wallet.usd;
 
       if (tokens.length) {
+        const tokensContainer = document.getElementById("tokens");
         getTokensById(tokens)
           .then(data => {
             let tokensHTML = "";
@@ -119,9 +120,15 @@
               tokensHTML += WalletToken(token, wallet[token.id]) || "";
             });
             totalUsd.innerHTML = `Total Balance: $${total.toFixed(2)}`;
-            document.getElementById("tokens").innerHTML += tokensHTML;
+            tokensContainer.innerHTML += tokensHTML;
           })
-          .catch(err => console.error(err));
+          .catch(err => {
+            console.error(err);
+            tokensContainer.innerHTML +=
+              "<span>Server Error - <a href=''>Refresh to try again</a></span>";
+          });
+      } else {
+        loadingSpinner.classList.add("d-none");
       }
       totalUsd.innerHTML = `Total Balance: $${
         total % 1 == 0 ? total.toFixed() : total.toFixed(2)

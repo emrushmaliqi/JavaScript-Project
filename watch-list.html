@@ -103,10 +103,16 @@
       addDynamicEventListener(document.body, "click", "#refreshBtn", e => {
         tokens.innerHTML = "";
         loadingSpinner.classList.remove("d-none");
-        getTokensById(localWatchList).then(data => updateTokens(data));
+        getTokensById(localWatchList)
+          .then(data => updateTokens(data))
+          .catch(err => {
+            console.error(err);
+            tokensContainer.innerHTML +=
+              "<span>Server Error - <a href=''>Refresh to try again</a></span>";
+          });
       });
 
-      if (localWatchList.length) {
+      if (localWatchList && localWatchList.length) {
         getTokensById(localWatchList)
           .then(data => {
             tokensContainer.innerHTML += `
@@ -126,9 +132,14 @@
       `;
             updateTokens(data);
           })
-          .catch(err => console.error(err));
+          .catch(err => {
+            console.error(err);
+            tokensContainer.innerHTML +=
+              "<span>Server Error - <a href=''>Refresh to try again</a></span>";
+          });
       } else {
         tokensContainer.innerHTML = "<h4>There are no tokens in WishList</h4>";
+        loadingSpinner.classList.add("d-none");
       }
 
       function updateTokens(data) {

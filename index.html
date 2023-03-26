@@ -17,6 +17,7 @@
     <div id="header"></div>
     <h2 class="container mt-4">Tokens</h2>
     <div class="container mt-5">
+      <div id="categoriesContainer" class="row mb-4"></div>
       <div class="row py-3 border-top border-bottom" id="tokensTableTitle">
         <h5 class="col-5 col-sm-4 col-md-3 col-lg-3">Name</h5>
         <h5 class="col-4 col-sm-3 col-md-2 col-lg-2">Price</h5>
@@ -41,6 +42,16 @@
       import Spinner from "./components/Spinner.js";
       import { getTokens, searchTokens } from "./modules/Tokens.js";
 
+      let activeCategory = null;
+      const categoriesData = {
+        "Zero Knowledge": "zero-knowledge-zk",
+        GameFi: "gaming",
+        "Smart Contract Platform": "smart-contract-platform",
+        "Decentralized Finance": "decentralized-finance-defi",
+        "Ecxhange-based Tokens": "exchange-based-tokens",
+        Meme: "meme-token",
+      };
+
       initializeHeader("home");
       initializeScrollToTop();
       const themeCircle = document.getElementById("theme-circle");
@@ -48,19 +59,49 @@
 
       let page = 1;
       updateTokensList();
+      for (const [name, categoryId] of Object.entries(categoriesData)) {
+        categoriesContainer.innerHTML += `<div class="col-2 text-center p-0"><p type="button" class="border py-2" category="${categoryId}">${name}</p></div>`;
+      }
 
-      function updateTokensList() {
+      const categories = document.querySelectorAll(
+        "#categoriesContainer div p"
+      );
+
+      categories.forEach(category => {
+        category.addEventListener("click", e => {
+          const categoryId = e.currentTarget.getAttribute("category");
+          activeCategory = categoryId;
+          page = 1;
+          tokens.innerHTML = "";
+          loadingSpinner.classList.remove("invisible");
+          updateTokensList(categoryId);
+          categories.forEach(
+            categ =>
+              categ.classList.contains("text-primary") &&
+              categ.classList.remove("text-primary", "border-primary")
+          );
+          category.classList.add("text-primary", "border-primary");
+        });
+      });
+
+      function updateTokensList(category = null) {
         setTimeout(() => {
-          getTokens(page)
+          getTokens(page, category)
             .then(data => {
               let tokensHTML = "";
-              data.forEach(token => (tokensHTML += Token(token) || ""));
+              if (data.length) {
+                data.forEach(token => (tokensHTML += Token(token) || ""));
+                window.addEventListener("scroll", handleInfiniteScroll);
+              } else tokensHTML = "No more tokens to show";
               tokens.innerHTML += tokensHTML;
               loadingSpinner.classList.add("invisible");
-              window.addEventListener("scroll", handleInfiniteScroll);
               page++;
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+              console.error(err);
+              tokens.innerHTML +=
+                "<span>Server Error - <a href=''>Refresh to try again</a></span>";
+            });
         }, 500);
       }
 
@@ -75,7 +116,7 @@
         ) {
           loadingSpinner.classList.remove("invisible");
           removeScrollListener();
-          updateTokensList();
+          updateTokensList(activeCategory);
         }
       }
 
