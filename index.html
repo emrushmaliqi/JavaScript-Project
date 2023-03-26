@@ -60,7 +60,7 @@
       let page = 1;
       updateTokensList();
       for (const [name, categoryId] of Object.entries(categoriesData)) {
-        categoriesContainer.innerHTML += `<div class="col-2 text-center p-0"><p type="button" class="border py-2" category="${categoryId}">${name}</p></div>`;
+        categoriesContainer.innerHTML += `<div class="col-6 my-md-0 my-2 col-lg-4 col-xl-2 text-center p-0"><p type="button" class="border py-2" category="${categoryId}">${name}</p></div>`;
       }
 
       const categories = document.querySelectorAll(
@@ -75,14 +75,16 @@
           tokens.innerHTML = "";
           loadingSpinner.classList.remove("invisible");
           updateTokensList(categoryId);
-          categories.forEach(
-            categ =>
-              categ.classList.contains("text-primary") &&
-              categ.classList.remove("text-primary", "border-primary")
-          );
+          removeCategoryActive();
           category.classList.add("text-primary", "border-primary");
         });
       });
+
+      function removeCategoryActive() {
+        categories.forEach(category =>
+          category.classList.remove("text-primary", "border-primary")
+        );
+      }
 
       function updateTokensList(category = null) {
         setTimeout(() => {
@@ -125,19 +127,26 @@
       function handleSearch(e) {
         e.preventDefault();
         if (searchQuery.value) {
+          removeCategoryActive();
           tokens.innerHTML = Spinner();
-          searchTokens(searchQuery.value).then(data => {
-            removeScrollListener();
-            let tokensHTML = "";
-            if (data.length) {
-              tokensTableTitle.classList.remove("d-none");
-              data.forEach(token => (tokensHTML += Token(token) || ""));
-            } else {
-              tokensHTML = "No tokens found!";
-              tokensTableTitle.classList.add("d-none");
-            }
-            tokens.innerHTML = tokensHTML;
-          });
+          searchTokens(searchQuery.value)
+            .then(data => {
+              removeScrollListener();
+              let tokensHTML = "";
+              if (data.length) {
+                tokensTableTitle.classList.remove("d-none");
+                data.forEach(token => (tokensHTML += Token(token) || ""));
+              } else {
+                tokensHTML = "No tokens found!";
+                tokensTableTitle.classList.add("d-none");
+              }
+              tokens.innerHTML = tokensHTML;
+            })
+            .catch(err => {
+              console.error(err);
+              tokens.innerHTML =
+                "<span>Server Error - <a href=''>Refresh to try again</a></span>";
+            });
         }
       }
     </script>
